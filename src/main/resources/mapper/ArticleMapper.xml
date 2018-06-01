@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.back.mapper.ArticleMapper">
+  <resultMap id="BaseResultMap" type="com.ssm.back.pojo.Article">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="article_title" jdbcType="VARCHAR" property="article_title" />
+    <result column="article_create_date" jdbcType="VARCHAR" property="article_create_date" />
+    <result column="is_top" jdbcType="INTEGER" property="is_top" />
+    <result column="add_name" jdbcType="VARCHAR" property="add_name" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.ssm.back.pojo.Article">
+    <result column="article_content" jdbcType="LONGVARCHAR" property="article_content" />
+  </resultMap>
+  	
+  	<resultMap type="Article" id="ArticleResult">
+        <result property="id" column="id"/>
+        <result property="articleTitle" column="articleTitle"/>
+        <result property="articleCreateDate" column="articleCreateDate"/>
+        <result property="articleContent" column="articleContent"/>
+        <result property="isTop" column="isTop"/>
+        <result property="addName" column="addName"/>
+    </resultMap>
+	
+	<update id="updArticle" parameterType="Article">
+		update ssm_article
+		set
+		articleTitle=#{articleTitle},articleContent=#{articleContent},
+		addName=#{addName}
+		where id=#{id}
+	</update>
+
+
+    <delete id="delArticle" parameterType="String">
+		delete from
+		ssm_article
+		where id=#{id}
+	</delete>
+
+    <select id="getArticleById" parameterType="String" resultMap="ArticleResult">
+		select id,articleTitle,articleCreateDate,articleContent,addName
+		from ssm_article where id=#{id}
+	</select>
+	
+  	<select id="findArticles" parameterType="Map" resultMap="ArticleResult">
+        select id,articleTitle,articleCreateDate,articleContent,addName from ssm_article
+        <where>
+            <if test="articleTitle!=null and articleTitle!='' ">
+                and articleTitle like #{articleTitle}
+            </if>
+        </where>
+        <if test="start!=null and size!=null">
+            limit #{start},#{size}
+        </if>
+    </select>
+  	
+	<select id="getTotalArticles" parameterType="Map" resultType="Long">
+        select count(*) from ssm_article
+        <where>
+            <if test="articleTitle!=null and articleTitle!='' ">
+                and articleTitle like #{articleTitle}
+            </if>
+        </where>
+    </select>
+	
+	 <insert id="insertArticle" useGeneratedKeys="true" keyProperty="id" parameterType="Article">
+		insert into
+		ssm_article(articleTitle,articleCreateDate,articleContent,addName)
+		values(#{articleTitle},#{articleCreateDate},#{articleContent},#{addName})
+	</insert>
+  
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, article_title, article_create_date, is_top, add_name
+  </sql>
+  <sql id="Blob_Column_List">
+    article_content
+  </sql>
+  <select id="selectByExampleWithBLOBs" parameterType="com.ssm.back.pojo.ArticleExample" resultMap="ResultMapWithBLOBs">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'false' as QUERYID,
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from ssm_article
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="com.ssm.back.pojo.ArticleExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    'false' as QUERYID,
+    <include refid="Base_Column_List" />
+    from ssm_article
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from ssm_article
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from ssm_article
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ssm.back.pojo.Article" useGeneratedKeys="true">
+    insert into ssm_article (article_title, article_create_date, 
+      is_top, add_name, article_content
+      )
+    values (#{article_title,jdbcType=VARCHAR}, #{article_create_date,jdbcType=VARCHAR}, 
+      #{is_top,jdbcType=INTEGER}, #{add_name,jdbcType=VARCHAR}, #{article_content,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ssm.back.pojo.Article" useGeneratedKeys="true">
+    insert into ssm_article
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="article_title != null">
+        article_title,
+      </if>
+      <if test="article_create_date != null">
+        article_create_date,
+      </if>
+      <if test="is_top != null">
+        is_top,
+      </if>
+      <if test="add_name != null">
+        add_name,
+      </if>
+      <if test="article_content != null">
+        article_content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="article_title != null">
+        #{article_title,jdbcType=VARCHAR},
+      </if>
+      <if test="article_create_date != null">
+        #{article_create_date,jdbcType=VARCHAR},
+      </if>
+      <if test="is_top != null">
+        #{is_top,jdbcType=INTEGER},
+      </if>
+      <if test="add_name != null">
+        #{add_name,jdbcType=VARCHAR},
+      </if>
+      <if test="article_content != null">
+        #{article_content,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ssm.back.pojo.Article">
+    update ssm_article
+    <set>
+      <if test="article_title != null">
+        article_title = #{article_title,jdbcType=VARCHAR},
+      </if>
+      <if test="article_create_date != null">
+        article_create_date = #{article_create_date,jdbcType=VARCHAR},
+      </if>
+      <if test="is_top != null">
+        is_top = #{is_top,jdbcType=INTEGER},
+      </if>
+      <if test="add_name != null">
+        add_name = #{add_name,jdbcType=VARCHAR},
+      </if>
+      <if test="article_content != null">
+        article_content = #{article_content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ssm.back.pojo.Article">
+    update ssm_article
+    set article_title = #{article_title,jdbcType=VARCHAR},
+      article_create_date = #{article_create_date,jdbcType=VARCHAR},
+      is_top = #{is_top,jdbcType=INTEGER},
+      add_name = #{add_name,jdbcType=VARCHAR},
+      article_content = #{article_content,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ssm.back.pojo.Article">
+    update ssm_article
+    set article_title = #{article_title,jdbcType=VARCHAR},
+      article_create_date = #{article_create_date,jdbcType=VARCHAR},
+      is_top = #{is_top,jdbcType=INTEGER},
+      add_name = #{add_name,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
